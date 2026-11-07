@@ -1,0 +1,24 @@
+ŹRÓDŁA DŹWIĘKÓW
+================
+
+Fantasy Ambient Sound Effects Pack – kmontesdev (oznaczona jako CC0)
+  https://kmontesdev.itch.io/fantasy-ambient-sound-effects-pack-cc0
+  wszystkie pętle ambientu (ambient/*.wav), krzyki, smok, potwory, większość odgłosów walki
+  Uwaga: to składanka z różnych źródeł – licencja poszczególnych nagrań nie jest pewna.
+  Na domowe sesje bez znaczenia; przed publicznym streamowaniem (np. bot na otwartym
+  serwerze) warto to sprawdzić. Plik z Epidemic Sound (ES_…) został pominięty.
+
+Kenney – RPG Audio (CC0)            https://kenney.nl/assets/rpg-audio
+  drzwi, skrzypnięcia, zatrzask, monety, księga, wyjęcie noża
+
+Kenney – Impact Sounds (CC0)        https://kenney.nl/assets/impact-sounds
+  dzwon, tłuczone szkło
+
+RPG Sound Pack – artisticdude (CC0) https://opengameart.org/content/rpg-sound-pack
+  magic missile, leczenie, dobycie miecza, świst broni, warczenie bestii, ogr, olbrzym,
+  upiór, szlam, ugryzienie, mikstura, zbroja
+
+Pętle ambientu zostały przycięte do ~60 s, zapętlone bez szwu i wyrównane głośnością
+narzędziem scripts/audio-tools.mjs. Serie uderzeń pocięto na pojedyncze warianty.
+
+Dodając pliki z innych źródeł, dopisz je tutaj razem z licencją.

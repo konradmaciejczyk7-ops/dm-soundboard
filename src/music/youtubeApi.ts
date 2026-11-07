@@ -1,0 +1,100 @@
+// Minimalne typy i ładowanie YouTube IFrame Player API.
+// https://developers.google.com/youtube/iframe_api_reference
+
+export const YTState = {
+  Unstarted: -1,
+  Ended: 0,
+  Playing: 1,
+  Paused: 2,
+  Buffering: 3,
+  Cued: 5,
+} as const;
+
+export interface YTPlayer {
+  loadPlaylist(args: { list: string; listType: 'playlist'; index?: number }): void;
+  loadVideoById(videoId: string): void;
+  playVideo(): void;
+  pauseVideo(): void;
+  stopVideo(): void;
+  seekTo(seconds: number, allowSeekAhead: boolean): void;
+  nextVideo(): void;
+  playVideoAt(index: number): void;
+  setVolume(volume: number): void;
+  unMute(): void;
+  setShuffle(on: boolean): void;
+  setLoop(on: boolean): void;
+  getPlaylist(): string[] | null;
+  getVideoData(): { title?: string; video_id?: string };
+  destroy(): void;
+}
+
+interface YTPlayerOptions {
+  width?: string | number;
+  height?: string | number;
+  playerVars?: Record<string, string | number>;
+  events?: {
+    onReady?: () => void;
+    onStateChange?: (e: { data: number }) => void;
+    onError?: (e: { data: number }) => void;
+  };
+}
+
+interface YTNamespace {
+  Player: new (el: HTMLElement, opts: YTPlayerOptions) => YTPlayer;
+}
+
+declare global {
+  interface Window {
+    YT?: YTNamespace;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+let loading: Promise<YTNamespace> | null = null;
+
+/** Wstrzykuje skrypt API tylko raz. Wymaga internetu. */
+export function loadYouTubeApi(timeoutMs = 15000): Promise<YTNamespace> {
+  if (window.YT?.Player) return Promise.resolve(window.YT);
+  if (loading) return loading;
+
+  loading = new Promise<YTNamespace>((resolve, reject) => {
+    const timer = window.setTimeout(() => {
+      loading = null;
+      reject(new Error('Nie udało się załadować YouTube – sprawdź połączenie z internetem.'));
+    }, timeoutMs);
+    const previous = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      previous?.();
+      window.clearTimeout(timer);
+      if (window.YT) resolve(window.YT);
+    };
+    const script = document.createElement('script');
+    script.src = 'https://www.youtube.com/iframe_api';
+    script.async = true;
+    script.onerror = () => {
+      window.clearTimeout(timer);
+      loading = null;
+      script.remove();
+      reject(new Error('Nie udało się załadować YouTube – sprawdź połączenie z internetem.'));
+    };
+    document.head.appendChild(script);
+  });
+  return loading;
+}
+
+/** Kody błędów odtwarzacza → komunikat dla DM-a. */
+export function describeYouTubeError(code: number): string {
+  switch (code) {
+    case 2:
+      return 'Nieprawidłowy link YouTube.';
+    case 5:
+      return 'Błąd odtwarzacza YouTube.';
+    case 100:
+      return 'Film nie istnieje albo jest prywatny.';
+    case 101:
+    case 150:
+      return 'Autor zablokował odtwarzanie tego filmu poza YouTube.';
+    default:
+      return `Błąd YouTube (${code}).`;
+  }
+}
