@@ -59,7 +59,7 @@ function MoodEditorDialog() {
   const add = () =>
     setDrafts((list) => [
       ...list,
-      toDraft({ id: `mood-${Date.now().toString(36)}`, name: 'Nowy nastrój', emoji: '🎵', color: '#9d93ab', source: null, oneShot: false, returnTo: null }),
+      toDraft({ id: `mood-${Date.now().toString(36)}`, name: 'New mood', emoji: '🎵', color: '#9d93ab', source: null, oneShot: false, returnTo: null, favorite: true }),
     ]);
 
   const invalid = drafts.some(youtubeInvalid) || drafts.some((d) => !d.mood.name.trim());
@@ -80,28 +80,29 @@ function MoodEditorDialog() {
     <div className="overlay" onKeyDown={onKeyDown}>
       <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="mood-editor-title">
         <header className="dialog__header">
-          <h2 id="mood-editor-title">Nastroje i playlisty</h2>
-          <button type="button" className="tool-btn" title="Zamknij (Esc)" onClick={close}>
+          <h2 id="mood-editor-title">Moods and playlists</h2>
+          <button type="button" className="tool-btn" title="Close (Esc)" onClick={close}>
             ✕
           </button>
         </header>
 
         <p className="dialog__hint">
-          <strong>YouTube:</strong> wklej link do playlisty lub filmu (publiczna albo niepubliczna, nie prywatna). Żeby
-          nie było reklam, bądź zalogowany na YouTube Premium w tej przeglądarce.
+          <strong>YouTube:</strong> paste a playlist or video link (public or unlisted, not private). To avoid
+          ads, be signed in to YouTube Premium in this browser.
           <br />
-          <strong>Lokalnie:</strong> wrzuć pliki do <code>public/sounds/music/&lt;nazwa&gt;/</code> i odśwież stronę –
-          folder pojawi się na liście.
+          <strong>Local:</strong> put files in <code>public/sounds/music/&lt;name&gt;/</code> and refresh the page –
+          the folder will appear in the list.
         </p>
 
         <div className="mood-rows">
           <div className="mood-row mood-row--head">
-            <span>Ikona</span>
-            <span>Nazwa</span>
-            <span>Kolor</span>
-            <span>Źródło</span>
-            <span>Muzyka</span>
-            <span>Jeden utwór, potem…</span>
+            <span title="Favorites are shown in the bar at the top">Favorite</span>
+            <span>Icon</span>
+            <span>Name</span>
+            <span>Color</span>
+            <span>Source</span>
+            <span>Music</span>
+            <span>One track, then…</span>
             <span />
           </div>
           {drafts.map((d, i) => (
@@ -123,14 +124,14 @@ function MoodEditorDialog() {
 
         <footer className="dialog__footer">
           <button type="button" className="chip" onClick={add}>
-            ＋ Dodaj nastrój
+            ＋ Add mood
           </button>
           <span className="dialog__spacer" />
           <button type="button" className="chip" onClick={close}>
-            Anuluj
+            Cancel
           </button>
           <button type="button" className="chip is-on" disabled={invalid} onClick={save}>
-            Zapisz
+            Save
           </button>
         </footer>
       </div>
@@ -157,30 +158,37 @@ function MoodRow({ draft: d, index, count, others, playlists, autoFocus, onDraft
   return (
     <div className={`mood-row${autoFocus ? ' is-focused' : ''}`}>
       <input
+        type="checkbox"
+        className="mood-row__fav"
+        checked={d.mood.favorite}
+        aria-label="Favorite – show in the top bar"
+        onChange={(e) => onMood({ favorite: e.target.checked })}
+      />
+      <input
         className="field field--emoji"
         value={d.mood.emoji}
         maxLength={4}
-        aria-label="Ikona"
+        aria-label="Icon"
         onChange={(e) => onMood({ emoji: e.target.value })}
       />
-      <input className="field" value={d.mood.name} aria-label="Nazwa" onChange={(e) => onMood({ name: e.target.value })} />
+      <input className="field" value={d.mood.name} aria-label="Name" onChange={(e) => onMood({ name: e.target.value })} />
       <input
         className="field field--color"
         type="color"
         value={d.mood.color}
-        aria-label="Kolor"
+        aria-label="Color"
         onChange={(e) => onMood({ color: e.target.value })}
       />
       <select
         className="field"
         value={d.kind}
-        aria-label="Źródło muzyki"
+        aria-label="Music source"
         autoFocus={autoFocus}
         onChange={(e) => onDraft({ kind: e.target.value as SourceKind })}
       >
-        <option value="none">— brak —</option>
+        <option value="none">— none —</option>
         <option value="youtube">YouTube</option>
-        <option value="local">Lokalne pliki</option>
+        <option value="local">Local files</option>
       </select>
 
       <div className="mood-row__source">
@@ -191,20 +199,20 @@ function MoodRow({ draft: d, index, count, others, playlists, autoFocus, onDraft
               placeholder="https://www.youtube.com/playlist?list=…"
               value={d.url}
               spellCheck={false}
-              aria-label="Link YouTube"
+              aria-label="YouTube link"
               onChange={(e) => onDraft({ url: e.target.value })}
             />
             <span className="field-note">
-              {!d.url.trim() ? '' : ref ? (ref.playlistId ? '✓ playlista' : '✓ film') : '✗ to nie link YouTube'}
+              {!d.url.trim() ? '' : ref ? (ref.playlistId ? '✓ playlist' : '✓ video') : '✗ not a YouTube link'}
             </span>
           </>
         )}
         {d.kind === 'local' &&
           (playlists.length === 0 ? (
-            <span className="field-note">Brak folderów w public/sounds/music/</span>
+            <span className="field-note">No folders in public/sounds/music/</span>
           ) : (
-            <select className="field" value={d.playlist} aria-label="Folder z muzyką" onChange={(e) => onDraft({ playlist: e.target.value })}>
-              <option value="">— wybierz folder —</option>
+            <select className="field" value={d.playlist} aria-label="Music folder" onChange={(e) => onDraft({ playlist: e.target.value })}>
+              <option value="">— choose folder —</option>
               {playlists.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name} ({p.files.length})
@@ -218,17 +226,17 @@ function MoodRow({ draft: d, index, count, others, playlists, autoFocus, onDraft
         <input
           type="checkbox"
           checked={d.mood.oneShot}
-          aria-label="Jeden utwór, potem przejdź dalej"
+          aria-label="One track, then move on"
           onChange={(e) => onMood({ oneShot: e.target.checked })}
         />
         <select
           className="field"
           disabled={!d.mood.oneShot}
           value={d.mood.returnTo ?? ''}
-          aria-label="Po utworze przejdź do"
+          aria-label="After the track go to"
           onChange={(e) => onMood({ returnTo: e.target.value || null })}
         >
-          <option value="">zatrzymaj muzykę</option>
+          <option value="">stop music</option>
           {others.map((m) => (
             <option key={m.id} value={m.id}>
               {m.emoji} {m.name}
@@ -238,13 +246,13 @@ function MoodRow({ draft: d, index, count, others, playlists, autoFocus, onDraft
       </div>
 
       <div className="mood-row__actions">
-        <button type="button" className="tool-btn tool-btn--sm" title="W górę" disabled={index === 0} onClick={() => onMove(-1)}>
+        <button type="button" className="tool-btn tool-btn--sm" title="Move up" disabled={index === 0} onClick={() => onMove(-1)}>
           ↑
         </button>
-        <button type="button" className="tool-btn tool-btn--sm" title="W dół" disabled={index === count - 1} onClick={() => onMove(1)}>
+        <button type="button" className="tool-btn tool-btn--sm" title="Move down" disabled={index === count - 1} onClick={() => onMove(1)}>
           ↓
         </button>
-        <button type="button" className="tool-btn tool-btn--sm" title="Usuń nastrój" onClick={onRemove}>
+        <button type="button" className="tool-btn tool-btn--sm" title="Delete mood" onClick={onRemove}>
           🗑
         </button>
       </div>

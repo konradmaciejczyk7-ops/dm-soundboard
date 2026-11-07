@@ -57,6 +57,7 @@ button {
   height: 100vh;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr); /* strona nigdy nie jest szersza od okna */
   gap: 12px;
   padding: 12px 16px;
 }
@@ -65,6 +66,7 @@ button {
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0; /* bez tego długi pasek nastrojów rozpychał całą stronę wszerz */
 }
 
 .brand {
@@ -85,11 +87,41 @@ button {
   gap: 8px;
 }
 
+/* Przyciski nastrojów przewijają się w poziomie; ⏹ i ⚙️ zostają na miejscu. */
+.moods__list {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* miejsce na poświatę aktywnego nastroju; pasek przewijania pod przyciskami */
+  padding: 4px 4px 8px;
+  margin: -4px -4px -8px;
+  scrollbar-width: thin;
+  scrollbar-color: #6a5a82 rgba(255, 255, 255, 0.04);
+}
+
+.moods__list::-webkit-scrollbar {
+  height: 8px;
+}
+
+.moods__list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+}
+
+.moods__list::-webkit-scrollbar-thumb {
+  background: #6a5a82;
+  border-radius: 4px;
+}
+
+/* Maksymalnie 6 nastrojów naraz – każdy zajmuje 1/6 szerokości (minus 5 odstępów po 8 px). */
 .mood {
   --mood-color: var(--gold);
   position: relative;
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 calc((100% - 5 * 8px) / 6);
+  min-width: 90px;
   height: 64px;
   display: flex;
   flex-direction: column;
@@ -912,7 +944,7 @@ button {
 
 .mood-row {
   display: grid;
-  grid-template-columns: 52px 1.1fr 44px 130px 2.2fr 1.5fr auto;
+  grid-template-columns: 64px 52px 1.1fr 44px 130px 2.2fr 1.5fr auto;
   gap: 8px;
   align-items: center;
   padding: 6px 8px;
@@ -926,6 +958,14 @@ button {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-dim);
+}
+
+.mood-row__fav {
+  justify-self: center;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--gold);
+  cursor: pointer;
 }
 
 .mood-row.is-focused {

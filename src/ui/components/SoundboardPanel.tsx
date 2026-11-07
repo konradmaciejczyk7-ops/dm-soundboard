@@ -19,24 +19,24 @@ export function SoundboardPanel() {
   return (
     <section className="panel">
       <div className="panel__header">
-        <h2 className="panel__title">Efekty</h2>
+        <h2 className="panel__title">Effects</h2>
         <SearchBox />
         <ToggleChip
           on={options.humanize}
-          label="🎲 Losowość"
-          title="Lekka losowa zmiana wysokości i głośności przy każdym odtworzeniu"
+          label="🎲 Variation"
+          title="Slight random pitch and volume change on every play"
           onToggle={() => dispatch({ type: 'options/set', options: { humanize: !options.humanize } })}
         />
         <ToggleChip
           on={options.ducking}
           label="🔉 Ducking"
-          title="Ściszaj muzykę na czas głośnych efektów"
+          title="Lower the music during loud effects"
           onToggle={() => dispatch({ type: 'options/set', options: { ducking: !options.ducking } })}
         />
         <ToggleChip
           on={assignMode}
-          label="⌨️ Skróty"
-          title="Tryb przypisywania skrótów klawiszowych"
+          label="⌨️ Hotkeys"
+          title="Keyboard shortcut assignment mode"
           onToggle={() => setAssignMode(!assignMode)}
         />
       </div>
@@ -45,7 +45,7 @@ export function SoundboardPanel() {
 
       {filtered.length === 0 ? (
         <div className="placeholder-note">
-          {library.sfx.length === 0 ? 'Brak efektów w manifest.json' : `Brak efektów dla „${search}”`}
+          {library.sfx.length === 0 ? 'No effects in manifest.json' : `No effects matching “${search}”`}
         </div>
       ) : (
         <div className="sfx-columns">

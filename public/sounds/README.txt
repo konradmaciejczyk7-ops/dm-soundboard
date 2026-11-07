@@ -3,18 +3,25 @@ JAK DODAĆ WBUDOWANE DŹWIĘKI
 
 1. Wrzuć plik do odpowiedniego folderu:
      ambient/   – zapętlone tła (deszcz, tawerna...)
-     sfx/       – efekty jednorazowe (od Etapu 2)
+     sfx/<kategoria>/ – efekty jednorazowe. Przyciski tworzą się SAME po odświeżeniu:
+                      pliki o tej samej nazwie i innym numerze na końcu to jeden
+                      przycisk z wariantami (losowany przy każdym kliknięciu):
+                        coins-1.wav, coins-2.wav, coins-7.ogg  → przycisk "Coins"
+                        dragon-f1.wav … dragon-f24.wav         → przycisk "Dragon"
+                        item-get.wav (bez numeru)              → przycisk "Item Get"
+                      Kategoria = nazwa folderu (nowy folder = nowa kolumna).
      music/<nazwa>/ – lokalna muzyka: każdy podfolder to playlista
                       (np. music/walka/, music/tawerna/). Nie trzeba nic wpisywać
                       w manifest.json – po odświeżeniu strony folder pojawi się
                       w ⚙️ (edycja nastrojów) jako źródło "Lokalne pliki".
                       Unikaj znaku # w nazwach plików.
 
-2. Dopisz go w manifest.json:
-     warstwa ambientu: { "id": "campfire", "name": "Ognisko", "emoji": "🔥", "file": "ambient/campfire.wav", "volume": 0.6 }
-     efekt:            { "id": "explosion", "name": "Wybuch", "emoji": "💥", "category": "combat",
-                         "files": ["sfx/combat/explosion-1.wav", "sfx/combat/explosion-2.wav"], "volume": 0.85, "loud": true }
-   "files" to warianty – przy każdym kliknięciu losowany jest inny.
+2. Ambient dopisz w manifest.json:
+     { "id": "campfire", "name": "Campfire", "emoji": "🔥", "file": "ambient/campfire.wav", "volume": 0.6 }
+   Efektu NIE trzeba dopisywać. Wpis w "sfx" jest potrzebny tylko, żeby zmienić
+   nazwę, emoji, głośność lub kategorię – "id" = nazwa pliku bez numeru:
+     { "id": "explosion", "name": "Big Boom", "emoji": "💥", "category": "combat", "volume": 0.85, "loud": true }
+   "files" jest opcjonalne – tylko dla plików o innej nazwie niż id.
    "loud": true – efekt ścisza muzykę (ducking). "randomize": false – bez losowej zmiany wysokości.
    Obsługiwane formaty: mp3, ogg, wav, m4a/aac, flac (zależnie od przeglądarki).
 
@@ -31,7 +38,7 @@ Wskazówki do ambientu:
 Wskazówki do efektów:
 - Plik z serią kilku uderzeń/krzyków potniesz na osobne warianty:
       node scripts/audio-tools.mjs split "seria.wav" public/sounds/sfx/combat/sword-hit-x
-  (powstaną sword-hit-x-1.wav, -2.wav… – dopisz je do "files" w manifest.json)
+  (powstaną sword-hit-x-1.wav, -2.wav… – same złożą się w jeden przycisk)
 
 Darmowe źródła (zawsze sprawdź licencję konkretnego pliku!):
 - Freesound            – freesound.org (filtr licencji: CC0; CC-BY wymaga podania autora)

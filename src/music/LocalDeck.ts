@@ -44,7 +44,7 @@ export class LocalDeck implements Deck {
   async start({ files, oneShot, shuffle }: LocalStartOptions): Promise<void> {
     this.stopNow();
     const token = this.token;
-    if (files.length === 0) throw new Error('Playlista jest pusta – wrzuć pliki do public/sounds/music/<nazwa>/.');
+    if (files.length === 0) throw new Error('Playlist is empty – put files in public/sounds/music/<name>/.');
     this.queue = shuffle ? shuffled(files) : [...files];
     this.reshuffle = shuffle;
     this.oneShot = oneShot;
@@ -117,7 +117,7 @@ export class LocalDeck implements Deck {
         lastError = err;
       }
     }
-    throw new Error(`Żaden plik z playlisty nie działa (${lastError instanceof Error ? lastError.message : 'nieznany błąd'}).`);
+    throw new Error(`No file in the playlist works (${lastError instanceof Error ? lastError.message : 'unknown error'}).`);
   }
 }
 

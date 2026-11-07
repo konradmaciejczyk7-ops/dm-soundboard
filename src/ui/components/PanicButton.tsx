@@ -9,7 +9,7 @@ export function PanicButton() {
     <button
       type="button"
       className={`panic${selected ? ' is-selected' : ''}`}
-      title="Płynnie wycisza wszystko w 1 s"
+      title="Fades everything out in 1 s"
       onClick={onActivate(() => dispatch({ type: 'panic' }))}
     >
       PANIC

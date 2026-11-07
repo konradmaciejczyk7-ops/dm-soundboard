@@ -67,6 +67,8 @@ export interface MoodDef {
   /** Zagraj jeden utwór, a potem przejdź do `returnTo` (null = zatrzymaj muzykę). */
   oneShot: boolean;
   returnTo: string | null;
+  /** Ulubiony – widoczny w pasku nastrojów na górze. Pozostałe działają przez skróty i edytor. */
+  favorite: boolean;
 }
 
 /** Do czego przypięty jest skrót klawiszowy. */

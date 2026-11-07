@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { musicIndex } from './vite-plugins/musicIndex';
+import { soundIndex } from './vite-plugins/soundIndex';
 
 export default defineConfig({
-  plugins: [react(), musicIndex()],
+  plugins: [react(), soundIndex()],
   server: { port: 5173, strictPort: true },
 });

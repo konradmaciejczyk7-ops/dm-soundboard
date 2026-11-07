@@ -29,7 +29,7 @@ export class BufferCache {
         return this.decodeUrl(source.url);
       case 'blob': {
         const blob = await this.resolveBlob?.(source.blobId);
-        if (!blob) throw new Error(`Nie znaleziono pliku ${source.blobId} w bazie.`);
+        if (!blob) throw new Error(`File ${source.blobId} not found in the database.`);
         return this.ctx.decodeAudioData(await blob.arrayBuffer());
       }
     }
@@ -37,10 +37,10 @@ export class BufferCache {
 
   private async decodeUrl(url: string): Promise<AudioBuffer> {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status} dla ${url}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
     // Serwer deweloperski dla brakujących plików potrafi oddać index.html.
     if (res.headers.get('content-type')?.includes('text/html')) {
-      throw new Error(`Brak pliku ${url}`);
+      throw new Error(`Missing file ${url}`);
     }
     return this.ctx.decodeAudioData(await res.arrayBuffer());
   }

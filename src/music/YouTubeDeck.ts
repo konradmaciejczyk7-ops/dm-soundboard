@@ -57,7 +57,7 @@ export class YouTubeDeck implements Deck {
   async start({ playlistId, videoId, oneShot, shuffle }: YouTubeStartOptions): Promise<void> {
     this.stopNow();
     const token = this.token;
-    if (!playlistId && !videoId) throw new Error('Brak linku YouTube.');
+    if (!playlistId && !videoId) throw new Error('No YouTube link.');
     const player = await this.ensurePlayer();
     if (token !== this.token) throw new CancelledError();
 
@@ -76,7 +76,7 @@ export class YouTubeDeck implements Deck {
     this.startTicker();
 
     const playing = new Promise<void>((resolve, reject) => {
-      const timer = window.setTimeout(() => this.settle(new Error('YouTube nie zaczął grać w ciągu 20 s.')), START_TIMEOUT_MS);
+      const timer = window.setTimeout(() => this.settle(new Error('YouTube did not start playing within 20 s.')), START_TIMEOUT_MS);
       this.pending = { resolve, reject, timer };
     });
     if (playlistId) player.loadPlaylist({ list: playlistId, listType: 'playlist', index: 0 });
@@ -196,7 +196,7 @@ export class YouTubeDeck implements Deck {
     const message = describeYouTubeError(code);
     // W playliście pomijamy filmy, których nie da się osadzić.
     if (this.isPlaylist && ++this.errorsInRow < MAX_ERRORS_IN_ROW) {
-      console.warn(`[music] ${message} – pomijam utwór.`);
+      console.warn(`[music] ${message} – skipping track.`);
       this.player?.nextVideo();
       return;
     }

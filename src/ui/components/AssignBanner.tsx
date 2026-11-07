@@ -18,11 +18,11 @@ export function AssignBanner() {
     <div className="assign-banner" role="status">
       {assignTarget ? (
         <>
-          Naciśnij klawisz dla <strong>{targetLabel(assignTarget, library)}</strong> · Backspace – usuń skrót · Esc –
-          anuluj
+          Press a key for <strong>{targetLabel(assignTarget, library)}</strong> · Backspace – remove shortcut · Esc –
+          cancel
         </>
       ) : (
-        <>Kliknij efekt, warstwę ambientu, nastrój albo PANIC, a potem naciśnij klawisz · Esc – zakończ</>
+        <>Click an effect, ambient layer, mood or PANIC, then press a key · Esc – finish</>
       )}
     </div>
   );

@@ -17,18 +17,18 @@ export const DEFAULT_HOTKEYS: HotkeyMap = {
 };
 
 const mood = (id: string, name: string, emoji: string, color: string, extra: Partial<MoodDef> = {}): MoodDef => ({
-  id, name, emoji, color, source: null, oneShot: false, returnTo: null, ...extra,
+  id, name, emoji, color, source: null, oneShot: false, returnTo: null, favorite: true, ...extra,
 });
 
 /** Startowa lista nastrojów – w aplikacji można ją dowolnie edytować. */
 export const DEFAULT_MOODS: MoodDef[] = [
-  mood('calm', 'Spokój', '🕊️', '#6fb3d9'),
-  mood('explore', 'Eksploracja', '🧭', '#7fc77a'),
-  mood('tension', 'Napięcie', '😰', '#d9b44a'),
-  mood('combat', 'Walka', '⚔️', '#d9643a'),
+  mood('calm', 'Calm', '🕊️', '#6fb3d9'),
+  mood('explore', 'Exploration', '🧭', '#7fc77a'),
+  mood('tension', 'Tension', '😰', '#d9b44a'),
+  mood('combat', 'Combat', '⚔️', '#d9643a'),
   mood('boss', 'Boss', '💀', '#c2406a'),
-  mood('victory', 'Zwycięstwo', '🏆', '#e8c547', { oneShot: true, returnTo: 'calm' }),
-  mood('sad', 'Smutek', '🥀', '#8a7fb8'),
+  mood('victory', 'Victory', '🏆', '#e8c547', { oneShot: true, returnTo: 'calm' }),
+  mood('sad', 'Sadness', '🥀', '#8a7fb8'),
 ];
 
 /** Czasy przejść w sekundach. */

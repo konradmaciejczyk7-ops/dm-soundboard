@@ -15,12 +15,12 @@ export function StartOverlay() {
         <div className="overlay__sigil" aria-hidden>
           🐉
         </div>
-        <h2>Gotów na sesję?</h2>
-        <p>Kliknij, aby uruchomić silnik dźwięku.</p>
+        <h2>Ready for the session?</h2>
+        <p>Click to start the audio engine.</p>
         <button type="button" className="overlay__start" onClick={start} autoFocus>
-          Rozpocznij sesję
+          Start session
         </button>
-        {error && <p className="overlay__error">Nie udało się uruchomić audio: {error}</p>}
+        {error && <p className="overlay__error">Could not start audio: {error}</p>}
       </div>
     </div>
   );

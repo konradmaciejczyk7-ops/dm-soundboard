@@ -24,7 +24,7 @@ export function SearchBox() {
       id={SEARCH_INPUT_ID}
       className="search"
       type="search"
-      placeholder="Szukaj efektu…  ( / )"
+      placeholder="Search effects…  ( / )"
       autoComplete="off"
       spellCheck={false}
       value={search}

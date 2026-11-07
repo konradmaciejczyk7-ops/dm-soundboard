@@ -24,7 +24,7 @@ export function EffectButton({ def }: { def: SfxDef }) {
       ref={ref}
       type="button"
       className={`sfx-btn${selected ? ' is-selected' : ''}`}
-      title={def.variants.length > 1 ? `${def.name} – ${def.variants.length} warianty` : def.name}
+      title={def.variants.length > 1 ? `${def.name} – ${def.variants.length} variants` : def.name}
       onMouseDown={preventFocus}
       onClick={onActivate(() => dispatch({ type: 'sfx/play', id: def.id }))}
     >

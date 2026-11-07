@@ -8,7 +8,7 @@ export function AmbientPanel() {
     <section className="panel">
       <h2 className="panel__title">Ambient</h2>
       {defs.length === 0 ? (
-        <div className="placeholder-note">Brak warstw – sprawdź public/sounds/manifest.json</div>
+        <div className="placeholder-note">No layers – check public/sounds/manifest.json</div>
       ) : (
         <div className="tile-grid">
           {defs.map((def) => (

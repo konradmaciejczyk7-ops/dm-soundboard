@@ -26,9 +26,23 @@ export function createInitialState(library: Library, saved: Partial<SavedSetting
     mixer: { ...DEFAULT_MIXER, ...saved.mixer },
     hotkeys,
     options: { ...DEFAULT_OPTIONS, ...saved.options },
-    moods: saved.moods ?? DEFAULT_MOODS,
+    // Nastroje zapisane przed dodaniem „ulubionych” traktujemy jako ulubione – nic nie znika z paska.
+    moods: saved.moods ? migrateMoodNames(saved.moods).map((m) => ({ ...m, favorite: m.favorite ?? true })) : DEFAULT_MOODS,
     currentMood: null,
   };
+}
+
+/** Dawne polskie nazwy domyślnych nastrojów → angielskie (własne nazwy użytkownika zostają bez zmian). */
+const LEGACY_MOOD_NAMES: Record<string, string> = {
+  calm: 'Spokój', explore: 'Eksploracja', tension: 'Napięcie', combat: 'Walka', victory: 'Zwycięstwo', sad: 'Smutek',
+};
+
+function migrateMoodNames(moods: SessionState['moods']): SessionState['moods'] {
+  return moods.map((m) => {
+    if (LEGACY_MOOD_NAMES[m.id] !== m.name) return m;
+    const name = DEFAULT_MOODS.find((d) => d.id === m.id)?.name;
+    return name ? { ...m, name } : m;
+  });
 }
 
 /** Przypisuje kombinację; jeśli była zajęta, odbiera ją poprzedniemu celowi. */

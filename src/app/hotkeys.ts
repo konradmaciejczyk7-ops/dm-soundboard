@@ -21,7 +21,7 @@ export function comboFromEvent(e: KeyboardEvent): string | null {
 }
 
 const CODE_LABELS: Record<string, string> = {
-  Escape: 'Esc', Space: 'Spacja', Enter: 'Enter', Backquote: '`', Minus: '-', Equal: '=',
+  Escape: 'Esc', Space: 'Space', Enter: 'Enter', Backquote: '`', Minus: '-', Equal: '=',
   BracketLeft: '[', BracketRight: ']', Semicolon: ';', Quote: "'", Comma: ',', Period: '.',
   Slash: '/', Backslash: '\\', ArrowLeft: '←', ArrowRight: '→', ArrowUp: '↑', ArrowDown: '↓',
   NumpadAdd: 'Num+', NumpadSubtract: 'Num-', NumpadMultiply: 'Num*', NumpadDivide: 'Num/',

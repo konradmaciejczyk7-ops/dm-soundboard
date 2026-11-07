@@ -37,7 +37,7 @@ export function LayerTile({ def }: { def: AmbientLayerDef }) {
         </span>
         <span className="tile__name">{def.name}</span>
         <span className="tile__state">
-          {error ? 'błąd pliku' : loading ? 'ładowanie…' : layer.active ? 'gra' : 'wył.'}
+          {error ? 'file error' : loading ? 'loading…' : layer.active ? 'playing' : 'off'}
         </span>
       </button>
       <span className="tile__kbd">
@@ -46,7 +46,7 @@ export function LayerTile({ def }: { def: AmbientLayerDef }) {
       <div className="tile__slider">
         <VolumeSlider
           value={layer.volume}
-          label={`Głośność: ${def.name}`}
+          label={`Volume: ${def.name}`}
           onChange={(volume) => dispatch({ type: 'layer/set', id: def.id, volume })}
         />
       </div>

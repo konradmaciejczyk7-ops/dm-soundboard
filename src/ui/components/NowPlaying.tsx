@@ -3,10 +3,10 @@ import { setYouTubeHost } from '../../music/youtubeHost';
 import { useAppStore } from '../../state/store';
 
 const STATE_LABEL = {
-  idle: 'Cisza',
-  loading: 'Ładowanie…',
-  playing: 'Gra',
-  error: 'Błąd',
+  idle: 'Silence',
+  loading: 'Loading…',
+  playing: 'Playing',
+  error: 'Error',
 } as const;
 
 export function NowPlaying() {
@@ -26,22 +26,22 @@ export function NowPlaying() {
       </div>
 
       <div className="np-info">
-        <h2 className="panel__title">Muzyka</h2>
+        <h2 className="panel__title">Music</h2>
         <div className="np-mood" style={mood ? { color: mood.color } : undefined}>
-          {mood ? `${mood.emoji} ${mood.name}` : 'Wybierz nastrój u góry'}
+          {mood ? `${mood.emoji} ${mood.name}` : 'Pick a mood at the top'}
         </div>
         <div className="np-title" title={status.title}>
           {status.state === 'error' ? status.message : (status.title ?? STATE_LABEL[status.state])}
         </div>
         <div className="np-meta">
-          {status.source && <span className="np-source">{status.source === 'youtube' ? 'YouTube' : 'Lokalnie'}</span>}
+          {status.source && <span className="np-source">{status.source === 'youtube' ? 'YouTube' : 'Local'}</span>}
           <span className={`np-state np-state--${status.state}`}>{STATE_LABEL[status.state]}</span>
         </div>
         <div className="np-controls">
-          <button type="button" className="tool-btn" title="Następny utwór" disabled={status.state !== 'playing'} onClick={() => dispatch({ type: 'music/next' })}>
+          <button type="button" className="tool-btn" title="Next track" disabled={status.state !== 'playing'} onClick={() => dispatch({ type: 'music/next' })}>
             ⏭
           </button>
-          <button type="button" className="tool-btn" title="Zatrzymaj muzykę" disabled={!isPlaying} onClick={() => dispatch({ type: 'mood/stop' })}>
+          <button type="button" className="tool-btn" title="Stop music" disabled={!isPlaying} onClick={() => dispatch({ type: 'mood/stop' })}>
             ⏹
           </button>
         </div>

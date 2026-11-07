@@ -6,8 +6,8 @@ import { VolumeSlider } from './VolumeSlider';
 const CHANNELS: Array<{ id: MixerChannel; label: string }> = [
   { id: 'master', label: 'Master' },
   { id: 'ambient', label: 'Ambient' },
-  { id: 'music', label: 'Muzyka' },
-  { id: 'sfx', label: 'Efekty' },
+  { id: 'music', label: 'Music' },
+  { id: 'sfx', label: 'Effects' },
 ];
 
 export function MixerStrip() {
@@ -20,7 +20,7 @@ export function MixerStrip() {
           <span className="mixer__label">{label}</span>
           <VolumeSlider
             value={mixer[id]}
-            label={`Głośność: ${label}`}
+            label={`Volume: ${label}`}
             onChange={(volume) => dispatch({ type: 'mixer/set', channel: id, volume })}
           />
           <span className="mixer__value">{Math.round(mixer[id] * 100)}</span>

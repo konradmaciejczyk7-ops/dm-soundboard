@@ -2,7 +2,7 @@ import type { MouseEvent } from 'react';
 import { formatCombo } from '../../app/hotkeys';
 
 export function HotkeyBadge({ combo, selected }: { combo?: string; selected?: boolean }) {
-  if (selected) return <kbd className="kbd kbd--waiting">naciśnij…</kbd>;
+  if (selected) return <kbd className="kbd kbd--waiting">press…</kbd>;
   if (!combo) return null;
   return <kbd className="kbd">{formatCombo(combo)}</kbd>;
 }

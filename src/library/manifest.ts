@@ -10,11 +10,13 @@ interface ManifestAmbientEntry {
 }
 
 interface ManifestSfxEntry {
+  /** = nazwa pliku bez numeru („coins” dla coins-1.wav, coins-2.wav…). */
   id: string;
-  name: string;
+  /** Brak → nazwa z pliku („item-get” → „Item Get”). */
+  name?: string;
   emoji?: string;
   category: string;
-  /** Warianty – ścieżki względem public/sounds/. */
+  /** Opcjonalnie – pliki o innej nazwie; pasujące pliki z folderu dołączają same. Ścieżki względem public/sounds/. */
   files?: string[];
   volume?: number;
   loud?: boolean;
@@ -40,14 +42,24 @@ function toAmbientDef(e: ManifestAmbientEntry): AmbientLayerDef | null {
   return { id: e.id, name: e.name, emoji: e.emoji ?? '🎵', source: fileSource(e.file), defaultVolume: e.volume ?? 0.6 };
 }
 
-function toSfxDef(e: ManifestSfxEntry): SfxDef | null {
-  if (!e.id || !e.name || !e.files?.length) return null;
+/** Efekt wykryty w folderach przez wtyczkę Vite (vite-plugins/soundIndex.ts). */
+interface SfxIndexEntry {
+  id: string;
+  category: string;
+  files: string[];
+}
+
+/** „item-get” → „Item Get”. */
+const titleCase = (id: string) => id.replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+function toSfxDef(e: ManifestSfxEntry, files: string[], categoryEmoji: (id: string) => string | undefined): SfxDef {
+  const category = e.category || 'other';
   return {
     id: e.id,
-    name: e.name,
-    emoji: e.emoji ?? '🔊',
-    category: e.category || 'other',
-    variants: e.files.map(fileSource),
+    name: e.name || titleCase(e.id),
+    emoji: e.emoji ?? categoryEmoji(category) ?? '🔊',
+    category,
+    variants: files.map(fileSource),
     volume: e.volume ?? 0.85,
     loud: e.loud ?? false,
     randomize: e.randomize ?? true,
@@ -55,40 +67,75 @@ function toSfxDef(e: ManifestSfxEntry): SfxDef | null {
   };
 }
 
+/**
+ * Łączy manifest z plikami z folderów sfx/:
+ * - wpis z manifestu (ten sam id co nazwa pliku bez numeru) dostaje wszystkie pasujące pliki –
+ *   nowy „coins-6.wav” sam dołącza do przycisku „Coins”;
+ * - pliki bez wpisu tworzą nowy przycisk (nazwa z pliku, kategoria z folderu).
+ * Manifest służy już tylko do ustawień: nazwa, emoji, głośność, loud, skrót.
+ */
+function buildSfx(entries: ManifestSfxEntry[], index: SfxIndexEntry[], categoryEmoji: (id: string) => string | undefined): SfxDef[] {
+  const byId = new Map<string, { entry: ManifestSfxEntry; files: string[] }>();
+  const owner = new Map<string, string>(); // plik → id wpisu, który go wymienia w "files"
+  for (const entry of entries) {
+    if (!entry.id || byId.has(entry.id)) continue;
+    byId.set(entry.id, { entry, files: [...(entry.files ?? [])] });
+    for (const f of entry.files ?? []) owner.set(f, entry.id);
+  }
+
+  for (const group of index) {
+    // Grupa trafia do wpisu o tym samym id, albo do wpisu, który ręcznie wymienia któryś z jej plików.
+    const targetId = byId.has(group.id) ? group.id : group.files.map((f) => owner.get(f)).find(Boolean);
+    const target = targetId ? byId.get(targetId) : undefined;
+    if (target) {
+      for (const f of group.files) if (!target.files.includes(f)) target.files.push(f);
+    } else {
+      byId.set(group.id, { entry: { id: group.id, name: '', category: group.category }, files: [...group.files] });
+    }
+  }
+
+  return [...byId.values()].filter((v) => v.files.length > 0).map((v) => toSfxDef(v.entry, v.files, categoryEmoji));
+}
+
 const notNull = <T>(v: T | null): v is T => v !== null;
 
-/** Lista lokalnej muzyki – generowana przez wtyczkę Vite (vite-plugins/musicIndex.ts). */
-async function loadMusicIndex(): Promise<MusicPlaylist[]> {
+/** Lista plików wygenerowana przez wtyczkę Vite (vite-plugins/soundIndex.ts); pusta, jeśli jej brak. */
+async function loadIndex<T>(name: string): Promise<T[]> {
   try {
-    const res = await fetch(`${SOUNDS_BASE}music-index.json`, { cache: 'no-cache' });
+    const res = await fetch(`${SOUNDS_BASE}${name}`, { cache: 'no-cache' });
     if (!res.ok || !res.headers.get('content-type')?.includes('json')) return [];
-    const entries = (await res.json()) as MusicPlaylist[];
-    return entries.map((e) => ({ ...e, files: e.files.map(soundUrl) }));
+    return (await res.json()) as T[];
   } catch (err) {
-    console.warn('[library] Brak listy lokalnej muzyki', err);
+    console.warn(`[library] Brak ${name}`, err);
     return [];
   }
 }
 
-/** Wczytuje public/sounds/manifest.json (ambient, efekty) i listę lokalnej muzyki. */
+/** Wczytuje public/sounds/manifest.json (ambient, ustawienia efektów) oraz listy plików z folderów. */
 export async function loadLibrary(): Promise<Library> {
-  const music = await loadMusicIndex();
+  const [musicIndex, sfxIndex] = await Promise.all([
+    loadIndex<MusicPlaylist>('music-index.json'),
+    loadIndex<SfxIndexEntry>('sfx-index.json'),
+  ]);
+  const music = musicIndex.map((e) => ({ ...e, files: e.files.map(soundUrl) }));
+
+  let manifest: SoundManifest = {};
   try {
     const res = await fetch(`${SOUNDS_BASE}manifest.json`, { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const manifest = (await res.json()) as SoundManifest;
-
-    const sfx = (manifest.sfx ?? []).map(toSfxDef).filter(notNull);
-    // Pokazujemy tylko kategorie, w których coś jest; nieznana kategoria dostaje własną kolumnę.
-    const sfxCategories = (manifest.sfxCategories ?? []).filter((c) => sfx.some((d) => d.category === c.id));
-    for (const def of sfx) {
-      if (!sfxCategories.some((c) => c.id === def.category)) {
-        sfxCategories.push({ id: def.category, name: def.category, emoji: '🔊' });
-      }
-    }
-    return { ambient: (manifest.ambient ?? []).map(toAmbientDef).filter(notNull), sfxCategories, sfx, music };
+    manifest = (await res.json()) as SoundManifest;
   } catch (err) {
     console.error('[library] Nie udało się wczytać manifest.json', err);
-    return { ambient: [], sfxCategories: [], sfx: [], music };
   }
+
+  const knownCategories = manifest.sfxCategories ?? [];
+  const sfx = buildSfx(manifest.sfx ?? [], sfxIndex, (id) => knownCategories.find((c) => c.id === id)?.emoji);
+  // Pokazujemy tylko kategorie, w których coś jest; nowy folder dostaje własną kolumnę.
+  const sfxCategories = knownCategories.filter((c) => sfx.some((d) => d.category === c.id));
+  for (const def of sfx) {
+    if (!sfxCategories.some((c) => c.id === def.category)) {
+      sfxCategories.push({ id: def.category, name: titleCase(def.category), emoji: '🔊' });
+    }
+  }
+  return { ambient: (manifest.ambient ?? []).map(toAmbientDef).filter(notNull), sfxCategories, sfx, music };
 }

@@ -60,7 +60,7 @@ export function loadYouTubeApi(timeoutMs = 15000): Promise<YTNamespace> {
   loading = new Promise<YTNamespace>((resolve, reject) => {
     const timer = window.setTimeout(() => {
       loading = null;
-      reject(new Error('Nie udało się załadować YouTube – sprawdź połączenie z internetem.'));
+      reject(new Error('Could not load YouTube – check your internet connection.'));
     }, timeoutMs);
     const previous = window.onYouTubeIframeAPIReady;
     window.onYouTubeIframeAPIReady = () => {
@@ -75,7 +75,7 @@ export function loadYouTubeApi(timeoutMs = 15000): Promise<YTNamespace> {
       window.clearTimeout(timer);
       loading = null;
       script.remove();
-      reject(new Error('Nie udało się załadować YouTube – sprawdź połączenie z internetem.'));
+      reject(new Error('Could not load YouTube – check your internet connection.'));
     };
     document.head.appendChild(script);
   });
@@ -86,15 +86,15 @@ export function loadYouTubeApi(timeoutMs = 15000): Promise<YTNamespace> {
 export function describeYouTubeError(code: number): string {
   switch (code) {
     case 2:
-      return 'Nieprawidłowy link YouTube.';
+      return 'Invalid YouTube link.';
     case 5:
-      return 'Błąd odtwarzacza YouTube.';
+      return 'YouTube player error.';
     case 100:
-      return 'Film nie istnieje albo jest prywatny.';
+      return 'The video does not exist or is private.';
     case 101:
     case 150:
-      return 'Autor zablokował odtwarzanie tego filmu poza YouTube.';
+      return 'The owner has blocked playback of this video outside YouTube.';
     default:
-      return `Błąd YouTube (${code}).`;
+      return `YouTube error (${code}).`;
   }
 }

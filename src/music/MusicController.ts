@@ -46,7 +46,7 @@ export class MusicController {
     const token = ++this.token;
     const source = mood.source;
     if (!source) {
-      this.setStatus({ moodId: mood.id, state: 'error', message: 'Ten nastrój nie ma jeszcze muzyki – ustaw ją w ⚙️.' });
+      this.setStatus({ moodId: mood.id, state: 'error', message: 'This mood has no music yet – set it in ⚙️.' });
       return;
     }
 
@@ -67,7 +67,7 @@ export class MusicController {
     try {
       if (source.kind === 'local') {
         const files = this.deps.resolvePlaylist(source.playlist);
-        if (!files) throw new Error(`Nie ma folderu public/sounds/music/${source.playlist}/.`);
+        if (!files) throw new Error(`Folder not found: public/sounds/music/${source.playlist}/.`);
         await (deck as LocalDeck).start({ files, oneShot: mood.oneShot, shuffle: true });
       } else {
         await (deck as YouTubeDeck).start({ playlistId: source.playlistId, videoId: source.videoId, oneShot: mood.oneShot, shuffle: true });
